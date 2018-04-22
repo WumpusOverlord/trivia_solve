@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 
-with open('config.json') as json_data_file:
+with open('./config.json') as json_data_file:
     data = json.load(json_data_file)
 
 buildargs = data["buildargs"]
