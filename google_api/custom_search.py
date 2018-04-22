@@ -1,23 +1,25 @@
-
 import search_google.api
-import pandas as pd
+import aiohttp
+import asyncio
+import json
 import requests
 from bs4 import BeautifulSoup
-import aiohttp
-import numpy as np
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 
-# Define buildargs for cse api
-buildargs = {
-    'serviceName': 'customsearch',
-    'version': 'v1',
-    'developerKey': 'AIzaSyAdBj2ReANUUvy2HkfU9ao5tBNps5UmHKM'
-}
+with open('config.json') as json_data_file:
+    data = json.load(json_data_file)
+
+buildargs = data["buildargs"]
+
+USER_AGENT = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'}
+
 
 def google_custom_search(question):
     cseargs = {
         'q': question,
-        'cx': '002540799615767059181:rs9wevaoahs',
+        'cx': data["cx"],
         'num': 10
     }
     print('scraping: ' + question)
@@ -25,32 +27,20 @@ def google_custom_search(question):
     return results
 
 
-
-import aiohttp
-import asyncio
-import async_timeout
-
-# all_answers = ""
-
-import asyncio
-
 def get_google_urls(question, answers):
 
     google_urls = []
     for answer in answers:
         words = question + " " + answer
-
         assert isinstance(words, str), 'Search term must be a string'
         assert isinstance(1, int), 'Number of results must be an integer'
         escaped_search_term = words.replace(' ', '+')
-
         google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, 1, 'en')
         google_urls.append(google_url)
 
     return google_urls
 
 def get_google_screen_scrapes(question_entities, answers):
-    str = ""
     question = " ".join(question_entities)
     google_urls = get_google_urls(question, answers)
     urls = google_urls
@@ -111,37 +101,15 @@ async def fetch_all(session, urls, loop):
                                      for url in urls])
     return results
 
-
-
-
-import requests
-from bs4 import BeautifulSoup
-
-
-USER_AGENT = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'}
-
-
 async def fetch_results(search_term, number_results, language_code):
     assert isinstance(search_term, str), 'Search term must be a string'
     assert isinstance(number_results, int), 'Number of results must be an integer'
     escaped_search_term = search_term.replace(' ', '+')
-
     google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, number_results, language_code)
-
-    # response = aiohttp.get(google_url, headers=USER_AGENT)
     response = requests.get(google_url, headers=USER_AGENT)
     response.raise_for_status()
 
     return search_term, response.text
-
-
-# prime minister eurovision song contest britain ted heath
-
-import urllib.parse
-
-
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 def scrape_website(url):
     text_array = []
@@ -149,8 +117,6 @@ def scrape_website(url):
     page = requests.get(url)
 
     soup = BeautifulSoup(page.content, "lxml")
-    # self.soup = BeautifulSoup(html, "html.parser")
-    # soup = BeautifulSoup(page.content, 'html.parser')
     for text in soup.find_all('p'):
         text_string = text.get_text()
         try:

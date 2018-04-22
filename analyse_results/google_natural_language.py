@@ -1,19 +1,14 @@
-
 # Imports the Google Cloud client library
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/jeffh/Documents/Projects/Mortgages_Hackathon/mortgages_hackathon/data/my-key.json"
-
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data.."
 
 def get_entities(text):
     # Instantiates a client
     client = language.LanguageServiceClient()
-
-    # The text to analyze
-
     document = types.Document(
         content=text,
         type=enums.Document.Type.PLAIN_TEXT)
@@ -35,22 +30,18 @@ def get_entities(text):
         entity_names.append(entity_name)
 
     return entity_names
-
-def syntax_text(text):
-    """Detects syntax in the text."""
-    client = language.LanguageServiceClient()
-
-    # if isinstance(text, six.binary_type):
-    #     text = text.decode('utf-8')
-
-    # Instantiates a plain text document.
-    document = types.Document(
-        content=text,
-        type=enums.Document.Type.PLAIN_TEXT)
-
-    # Detects syntax in the document. You can also analyze HTML with:
-    #   document.type == enums.Document.Type.HTML
-
-    #
-    # print('Text: {}'.format(text))
-    # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
+#
+# def syntax_text(text):
+#     """Detects syntax in the text."""
+#     client = language.LanguageServiceClient()
+#     # Instantiates a plain text document.
+#     document = types.Document(
+#         content=text,
+#         type=enums.Document.Type.PLAIN_TEXT)
+#
+#     # Detects syntax in the document. You can also analyze HTML with:
+#     #   document.type == enums.Document.Type.HTML
+#
+#     #
+#     # print('Text: {}'.format(text))
+#     # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))

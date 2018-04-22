@@ -1,4 +1,3 @@
-
 import keyboard
 import screen_scrape.screen_grab as screen_grab
 import os
@@ -8,14 +7,15 @@ import inflect
 import analyse_results.analyse_results as ar
 from analyse_results import google_natural_language as gnl
 from analyse_results import wiki_lookup as wl
+import json
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/jeffh/Documents/Projects/Mortgages_Hackathon/mortgages_hackathon/data/my-key.json"
-save_path = '/home/jeffh/Documents/Projects/trivia_solver/trivia_solve/data/'
-img_name = "cropped_in_memory_to_disk.png"
+with open('config.json') as json_data_file:
+    data = json.load(json_data_file)
 
+img_name = data["img_name"]
+save_path = data["img_save_path"]
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=data["GOOGLE_APPLICATION_CREDENTIALS"]
 
-# text = "Which of these is a common material used in 3D printers"
-# text_entities = gnl.get_entities(text)
 
 def wait_for_key_to_solve():
     while True:

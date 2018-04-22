@@ -1,10 +1,13 @@
-import argparse
 import io
 import os
-
+import json
 from google.cloud import vision
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/jeffh/Documents/Projects/Mortgages_Hackathon/mortgages_hackathon/data/my-key.json"
+with open('config.json') as json_data_file:
+    data = json.load(json_data_file)
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=data["GOOGLE_APPLICATION_CREDENTIALS"]
+
 
 def detect_labels(path):
     client = vision.ImageAnnotatorClient()

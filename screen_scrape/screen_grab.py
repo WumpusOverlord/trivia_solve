@@ -1,18 +1,12 @@
-
-# import the necessary packages
 import numpy as np
 import pyautogui
-# import imutils
 import cv2
 import os
-import matplotlib.pyplot as plt
 
 def take_screenshot():
     image = pyautogui.screenshot()
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     return image
-
-
 
 def crop_screenshot(save_path, img_name, img):
     crop_img = img[550:1100, 150:710, :]
