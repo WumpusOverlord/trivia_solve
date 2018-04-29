@@ -238,10 +238,10 @@ answers = ["Birthday", "Piano Teacher", "Aunt/Mother"]
 # answers = ["Coolio", "Lily Alan", "Pippa Middleton"]
 
 
-question.set_answers(answers)
+# question.set_answers(answers)
 #
-solve_question_answers(question)
+# solve_question_answers(question)
 
 #
-# keyboard.wait('esc')
-# wait_for_key_to_solve()
+keyboard.wait('esc')
+wait_for_key_to_solve()
