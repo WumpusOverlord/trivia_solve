@@ -169,7 +169,7 @@ def convert_entities(urls):
     for answer_wiki in data:
         try:
             title = answer_wiki['query']['search'][0]['title']
-            print(title)
+            # print(title)
             titles[urls[i]] = title
         except:
             pass

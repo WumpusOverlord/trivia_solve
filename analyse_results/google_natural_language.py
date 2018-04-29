@@ -32,17 +32,39 @@ def get_entities(question):
 
     return entity_names
 #
-# def syntax_text(text):
-#     """Detects syntax in the text."""
-#     client = language.LanguageServiceClient()
-#     # Instantiates a plain text document.
-#     document = types.Document(
-#         content=text,
-#         type=enums.Document.Type.PLAIN_TEXT)
-#
-#     # Detects syntax in the document. You can also analyze HTML with:
-#     #   document.type == enums.Document.Type.HTML
-#
-#     #
-#     # print('Text: {}'.format(text))
-#     # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
+def syntax_text(question):
+    """Detects syntax in the text."""
+    text = question.text
+    client = language.LanguageServiceClient()
+    # Instantiates a plain text document.
+    document = types.Document(
+        content=text,
+        type=enums.Document.Type.PLAIN_TEXT)
+
+
+
+    # Detects syntax in the document. You can also analyze HTML with:
+    document.type == enums.Document.Type.HTML
+
+    tokens = client.analyze_syntax(document).tokens
+
+    # part-of-speech tags from enums.PartOfSpeech.Tag
+    pos_tag = ('UNKNOWN', 'ADJ', 'ADP', 'ADV', 'CONJ', 'DET', 'NOUN', 'NUM',
+               'PRON', 'PRT', 'PUNCT', 'VERB', 'X', 'AFFIX')
+
+    # for token in tokens:
+    #     token_stuff = (u'{}: {}'.format(pos_tag[token.part_of_speech.tag],
+    #                                    token.text.content))
+    #     token_type = pos_tag[token.part_of_speech.tag]
+    #     token_content = token.text.content
+    #     print(u'{}: {}'.format(pos_tag[token.part_of_speech.tag],
+    #                            token.text.content))
+
+    return tokens
+    #
+    # print('Text: {}'.format(text))
+    # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
+
+# NOTES:
+
+# WORDS TO CHECK FOR IN GOOGLE RESULTS:

@@ -58,13 +58,6 @@ def get_google_screen_scrapes(question):
 
 
 
-async def fetch(url, session):
-    async with session.get(url, headers=USER_AGENT) as response:
-        response = await response.text()
-        soup = BeautifulSoup(response, "lxml")
-        result_count = soup.find('div',{'id':'resultStats'}).text
-        return result_count
-
 
 async def run(urls):
     tasks = []
@@ -89,6 +82,7 @@ async def fetch(url, session):
         soup = BeautifulSoup(response, "lxml")
         result_count = soup.find('div',{'id':'resultStats'}).text
         print(result_count)
+        page = soup.getText()
         return response, result_count
 
 

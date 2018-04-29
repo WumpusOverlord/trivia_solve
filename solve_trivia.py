@@ -11,6 +11,7 @@ import json
 import question as q
 import time
 import inflect
+import string
 p = inflect.engine()
 
 
@@ -20,6 +21,20 @@ with open('config.json') as json_data_file:
 img_name = data["img_name"]
 save_path = data["img_save_path"]
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = data["GOOGLE_APPLICATION_CREDENTIALS"]
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+
 
 
 def wait_for_key_to_solve():
@@ -46,12 +61,13 @@ def analyse_google_results(question, search_terms):
     print('scraping site')
 
 
-def get_google_results(question):
-    answers = question.answers
+def get_google_results(search_term):
 
     # question.googleResults[question.text] = results
-    results = gcs.google_custom_search(question.text)
-    question.google_results[question.text] = results
+    results = gcs.google_custom_search(search_term)
+    return results
+
+    results_dictionary[search_term] = results
     # return question.text
     #
 
@@ -159,37 +175,166 @@ def clean_entities(question):
 def build_question_search_terms(question):
     # search_term1 = answer +
     # search_terms
-    for entity in question.convertedEntities:
-        if entity.lower() != question.answer_entity_type_singular:
-            for answer in question.answers:
-                search_term = answer.text + " " + str(entity)
-                answer.search_terms.append(search_term)
+    txt = question.text_without_stop_words
 
-    if 'not' in question.text:
-        question_part = question.text.split('not')[1]
-        for answer in question.answers:
-            search_term = answer.text + " " + str(question_part)
-            answer.search_terms.append(search_term)
+    if len(question.answer_entity_type)>0:
+        for entity in question.answer_entity_type.split(' '):
+            txt.remove(entity)
 
-    # Should search for just the celeb name as well
-    print('d')
+    txt_str = ' '.join(txt)
+    for answer in question.answers:
+        search_term = answer.text + " " + txt_str
+        answer.search_terms.append(search_term)
 
 
 
 
 
+
+    # If location: ASK "WHERE"
+    #
+
+
+    # for entity in question.convertedEntities:
+    #     if entity.lower() != question.answer_entity_type_singular:
+    #         for answer in question.answers:
+    #             search_term = answer.text + " " + str(entity)
+    #             answer.search_terms.append(search_term)
+    #
+    # if 'not' in question.text:
+    #     question_part = question.text.split('not')[1]
+    #     for answer in question.answers:
+    #         search_term = answer.text + " " + str(question_part)
+    #         answer.search_terms.append(search_term)
+    #
+    # # Should search for just the celeb name as well
+    # print('d')
+
+# def get_
+import re
+
+
+def convert_word_to_singular(word):
+    word_s = p.singular_noun(word, count=None)
+    if word_s != False:
+        return word_s
+    return word
+
+def analyse_the_result_item(answer, search_term, item):
+
+    counts = []
+    snippet = item['snippet']
+    snippet = snippet.lower()
+    snippet2 = snippet
+    for word in search_term:
+        lower = word.lower()
+        # singular = convert_word_to_singular(lower) TO DO ADD THE SINGULAR ONES
+        count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(lower), snippet))
+        counts.append(count)
+    term_length = len(search_term)*.6
+    sum_answer_count = np.count_nonzero(counts[:len(answer.seperate_words)])
+
+
+
+    # sum_count = sum(counts)
+
+    # print(bcolors.BOLD)
+    # print(counts, end=", ANSWER WORDS ONLY:  ")
+    # print(sum(counts[:len(answer.seperate_words)]), end= ", ALL WORDS: ")
+    # print(sum(counts))
+    # print(bcolors.ENDC)
+
+
+
+
+    if np.count_nonzero(counts)>=len(search_term)-1:
+
+        for word in snippet.split(" "):
+            # word_no_punc = word.translate(string.punctuation)
+
+            table = str.maketrans({key: None for key in string.punctuation})
+            word_no_punc = word.translate(table)
+            if word_no_punc in search_term:
+                print(bcolors.FAIL + word + bcolors.ENDC, end = " ")
+            else:
+                print(bcolors.OKBLUE + word + bcolors.ENDC, end=" ")
+
+
+
+
+            # print('\033[93m' + snippet + '\033[0m')
+        # answer.print_snippets.append(snippet)
+
+    #     CHANGE THIS TO LOOK FOR DISTANCE BETWEEN WORDS
+    if sum_answer_count>=len(answer.seperate_words)-1:
+        # print("D") SHOULD IT BE -1?
+        return counts
+    if len(answer.seperate_words) > 4:
+        return counts
+    return np.zeros(len(counts))
+    # print('done')
+
+
+import numpy as np
 
 def solve_question_answers(question):
     # try:
+
+    question.text_without_stop_words = ar.remove_stop_words(question)
+
+
     convert_answers_to_lower(question)
-    search_terms = get_google_results(question)
-    analyse_google_results(question, search_terms=question.text)
+
     question.originalEntities = gnl.get_entities(question)
     question.convertedEntities = clean_entities(question)
-
-
     question.get_answers_entity_type()
+
+    question.partsOfSpeech = gnl.syntax_text(question)
+
     build_question_search_terms(question)
+
+    for answer in question.answers:
+        print(answer.text)
+
+        for search_term in answer.search_terms:
+            # counts = []
+            split_search_term = search_term.split()
+            counts = np.zeros(len(split_search_term))
+            results = get_google_results(search_term)
+            answer.add_search_results(search_term, results)
+
+            all_results = answer.search_scores[search_term]
+            res_meta = all_results.metadata
+            res_items = all_results.metadata['items']
+            for item in res_items:
+                counts2 = np.array(analyse_the_result_item(answer, split_search_term, item))
+                counts = np.add(counts, counts2)
+                # print(counts2)
+                # print('d')
+
+    #         HEADER = '\033[95m'
+    # OKBLUE = '\033[94m'
+    # OKGREEN = '\033[92m'
+    # WARNING = '\033[93m'
+    # FAIL = '\033[91m'
+    # ENDC = '\033[0m'
+    # BOLD = '\033[1m'
+    # UNDERLINE = '\033[4m'
+            print(bcolors.BOLD)
+            print(counts, end=", ANSWER WORDS ONLY:  ")
+            print(sum(counts[:len(answer.seperate_words)]), end= ", ALL WORDS: ")
+            print(sum(counts))
+            print(bcolors.ENDC)
+
+    results = get_google_results(question.text)
+
+    question.add_search_results(question.text, results)
+
+
+    analyse_google_results(question, search_terms=question.text)
+
+
+
     t0 = time.time()
 
 
@@ -220,28 +365,52 @@ def convert_answers_to_lower(question):
 def solve_trivia():
     try:
         question, answers = get_img_labels()
-        question = q.Question(question)
-        question.set_answers(answers)
-        # print(question + answers)
         solve_question_answers(question)
     except:
         print('uh oh')
 
 
 # #
-question = q.Question("What do Edward Norton and Christian Slater share?")
-answers = ["Birthday", "Piano Teacher", "Aunt/Mother"]
+# question = q.Question("What do Edward Norton and Christian Slater share?")
+# answers = ["Birthday", "Piano Teacher", "Aunt/Mother"]
 
+# solve_trivia()
 # 34
 
-# question = q.Question("which of these celebrities has not published a cookbook")
-# answers = ["Coolio", "Lily Alan", "Pippa Middleton"]
 
 
-# question.set_answers(answers)
+import csv
+with open('./data/previous_questions.csv', 'r+') as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    x=0
+    for row in spamreader:
+
+        if (x==6):
+            question = row[0]
+            answers = []
+            answers.append(row[1])
+            answers.append(row[2])
+            answers.append(row[3])
+            print('d')
+            break
+        x = x+1
+        # print(', '.join(row))
+
+        # x=x+1
+print(question)
+question = q.Question(question)
+question.set_answers(answers)
+solve_question_answers(question)
+
 #
+# question = q.Question("which of these celebrities was born in the united states?")
+# answers = ["kiefer sutherland", "amy adam", "nicole kidman"]
+#
+#
+# question.set_answers(answers)
+# #
 # solve_question_answers(question)
 
 #
-keyboard.wait('esc')
-wait_for_key_to_solve()
+# keyboard.wait('esc')
+# wait_for_key_to_solve()

@@ -11,11 +11,21 @@ class Answer:
     answer_with_entity = ""
     search_terms = []
 
+
+    def add_search_results(self, search_term, results):
+
+        # question.googleResults[question.text] = results
+        # results = gcs.google_custom_search(search_term)
+        # results_dictionary[search_term] = results
+        self.search_scores[search_term] = results
+
+
     def __init__(self, answer_text):
         self.text = answer_text
         self.seperate_words = answer_text.lower().split()
         self.word_scores = {}
         self.search_terms = []
+        self.search_scores = {}
 
     def set_answer_with_entity(self, answer_with_entity):
         self.answer_with_entity = answer_with_entity
@@ -56,6 +66,9 @@ class Question:
         answer_en_sing = p.singular_noun(self.answer_entity_type, count=None)
         if answer_en_sing != False:
             answer_entity = answer_en_sing
+
+    def add_search_results(self, search_term, results):
+        self.google_results[search_term] = results
 
 
     def get_answers_entity_type(self):
@@ -110,6 +123,7 @@ class Question:
     def set_answers(self, answer_texts):
         answers = []
         for text in answer_texts:
+            text = text.replace('"', '')
             answers.append(Answer(text))
         self.answers = answers
 

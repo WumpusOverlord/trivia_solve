@@ -1,3 +1,5 @@
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 def website_score(answers, website_text):
     answer_scores = {}
@@ -19,6 +21,8 @@ def website_score(answers, website_text):
 
 import pandas as pd
 def analyse_resultsv2(question, search_term):
+
+    print("Search Term: " + search_term)
     results = question.google_results[search_term]
     items = results.metadata["items"]
     df = pd.DataFrame(data=items)
@@ -41,12 +45,39 @@ def analyse_resultsv2(question, search_term):
         print(answer.lower + "-  " + str(sum(ans_string)))
     return 'x'
 
+
+
+# def analyse_results3():
+
+
+
+
+
+
 # at = re.compile(r"@", re.I)
 def count_emails(string):
     count = 0
     for i in at.finditer(string):
         count += 1
     return count
+
+
+def remove_stop_words(question):
+    text = question.text
+    stop_words = set(stopwords.words('english'))
+    stop_words.add("?")
+    word_tokens = word_tokenize(text)
+
+    filtered_sentence = [w for w in word_tokens if not w in stop_words]
+
+    filtered_sentence = []
+
+    for w in word_tokens:
+        if w not in stop_words:
+            filtered_sentence.append(w)
+
+    # print(filtered_sentence)
+    return filtered_sentence
 
 def analyse_results(question, search_term):
     results = question.google_results[search_term]
@@ -68,6 +99,9 @@ def analyse_results(question, search_term):
         answer.set_word_scores(search_term, items)
     print(answer_scores)
     return results, word_scores, answer_scores
+
+# def get_entity_occurence():
+
 
 def get_entity_occurence_count(question, entity_occurences_dict):
     question_entities = question.convertedEntities
@@ -107,7 +141,7 @@ def analyse_wikis(question, answer_wikis):
 
 
 #
-# def get_occurences_in_question_content(entities, q_content):
+# def get_occurences_in_content(entities, q_content):
 #     entity_occurences = {}
 #     for entity in entities:
 #         entity_lower = entity.lower()
