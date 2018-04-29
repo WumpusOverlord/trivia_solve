@@ -6,8 +6,9 @@ import os
 
 # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data.."
 
-def get_entities(text):
+def get_entities(question):
     # Instantiates a client
+    text = question.text
     client = language.LanguageServiceClient()
     document = types.Document(
         content=text,

@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
-
+import question as q
 
 with open('./config.json') as json_data_file:
     data = json.load(json_data_file)
@@ -27,29 +27,34 @@ def google_custom_search(question):
     return results
 
 
-def get_google_urls(question, answers):
+def get_google_urls(question_text, answers):
 
     google_urls = []
     for answer in answers:
-        words = question + " " + answer
+        words = question_text + " " + answer.lower
         assert isinstance(words, str), 'Search term must be a string'
         assert isinstance(1, int), 'Number of results must be an integer'
         escaped_search_term = words.replace(' ', '+')
         google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, 1, 'en')
         google_urls.append(google_url)
-
+    #     TO-DO: APPEND URL TO ANSWER
     return google_urls
 
-def get_google_screen_scrapes(question_entities, answers):
-    question = " ".join(question_entities)
-    google_urls = get_google_urls(question, answers)
+def get_google_screen_scrapes(question):
+
+    question_entities = question.convertedEntities
+    questionText = " ".join(question_entities)
+    question.googleSearchTerm = questionText
+    google_urls = get_google_urls(questionText, question.answers)
     urls = google_urls
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(run(urls))
     data = loop.run_until_complete(future)
+    return data
     # loop.close()
-    for x in range(0,len(answers)):
-        print(answers[x] + " " + data[x])
+    # for x in range(0,len(question.answers)):
+    #     question.answers.append(q.Answer(question.answers[x]))
+    #     print(question.answers[x] + " " + data[x])
 
 
 
@@ -83,7 +88,8 @@ async def fetch(url, session):
         response = await response.text()
         soup = BeautifulSoup(response, "lxml")
         result_count = soup.find('div',{'id':'resultStats'}).text
-        return result_count
+        print(result_count)
+        return response, result_count
 
 
 async def run(urls):
