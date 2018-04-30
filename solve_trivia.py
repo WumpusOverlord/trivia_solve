@@ -385,7 +385,7 @@ with open('./data/previous_questions.csv', 'r+') as csvfile:
     x=0
     for row in spamreader:
 
-        if (x==6):
+        if (x==1):
             question = row[0]
             answers = []
             answers.append(row[1])
