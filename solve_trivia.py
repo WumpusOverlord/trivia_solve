@@ -293,6 +293,13 @@ def solve_question_answers(question):
 
     build_question_search_terms(question)
 
+    results = get_google_results(question.text)
+
+    question.add_search_results(question.text, results)
+
+
+    analyse_google_results(question, search_terms=question.text)
+
     for answer in question.answers:
         print(answer.text)
 
@@ -326,12 +333,7 @@ def solve_question_answers(question):
             print(sum(counts))
             print(bcolors.ENDC)
 
-    results = get_google_results(question.text)
 
-    question.add_search_results(question.text, results)
-
-
-    analyse_google_results(question, search_terms=question.text)
 
 
 
@@ -347,6 +349,7 @@ def solve_question_answers(question):
     answers_wikis = answer_wikis[1]
     entity_occurences = ar.analyse_wikis(question, answers_wikis)
     entity_occurence_count = ar.get_entity_occurence_count(question, entity_occurences)
+    print('done')
     # answers = convert_answers_to_lower(question)
     # except:
     #     pass
@@ -397,10 +400,10 @@ with open('./data/previous_questions.csv', 'r+') as csvfile:
         # print(', '.join(row))
 
         # x=x+1
-print(question)
-question = q.Question(question)
-question.set_answers(answers)
-solve_question_answers(question)
+# print(question)
+# question = q.Question(question)
+# question.set_answers(answers)
+# solve_question_answers(question)
 
 #
 # question = q.Question("which of these celebrities was born in the united states?")
@@ -411,6 +414,8 @@ solve_question_answers(question)
 # #
 # solve_question_answers(question)
 
+
+solve_trivia()
 #
-# keyboard.wait('esc')
-# wait_for_key_to_solve()
+keyboard.wait('esc')
+wait_for_key_to_solve()

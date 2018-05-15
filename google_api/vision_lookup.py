@@ -7,12 +7,20 @@ from google.cloud import vision
 #     data = json.load(json_data_file)
 #
 # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=data["GOOGLE_APPLICATION_CREDENTIALS"]
-
-
+import pytesseract
+from PIL import Image
 def detect_labels(path):
     client = vision.ImageAnnotatorClient()
     with io.open(path, 'rb') as image_file:
         content = image_file.read()
+
+    # with io.open(path, 'rb') as image_file:
+    #     content = image_file.read()
+
+    # text = pytesseract.image_to_string(Image.open(path))
+    # load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file
+    # text = pytesseract.image_to_string(content)
+
 
     image = vision.types.Image(content=content)
     response = client.text_detection(image=image)

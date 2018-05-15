@@ -130,8 +130,8 @@ async def run(urls):
         responses = await asyncio.gather(*tasks)
         wiki_pages = []
         for response in responses:
-            pageid = response['query']['search'][0]['pageid']
             try:
+                pageid = response['query']['search'][0]['pageid']
                 ny = wikipedia.page(pageid=pageid)
                 wiki_pages.append(ny)
             except:

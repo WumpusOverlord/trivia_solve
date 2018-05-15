@@ -1,5 +1,9 @@
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+import nltk
+# nltk.download('stopwords')
+# nltk.download('punkt')
+
 
 def website_score(answers, website_text):
     answer_scores = {}
