@@ -1,9 +1,6 @@
 Readme
 
 
-which pair swapped places when the jackson 5 became the jacksons?
-
-
 # trivia_solve
 Plan:
 Use http://web.airdroid.com/ to mirror screen
@@ -82,3 +79,8 @@ TO DO:
         https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture
  Get tables from wikipedia for the wikis associated with each possible answers ---> Filter all tables by ones which have the new question entity in header<
     find rows which have the new entity
+ 
+Intersting questions: 
+which pair swapped places when the jackson 5 became the jacksons?
+
+
